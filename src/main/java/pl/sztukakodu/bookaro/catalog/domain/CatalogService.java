@@ -1,22 +1,20 @@
 package pl.sztukakodu.bookaro.catalog.domain;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class CatalogService {
-    private CatalogRepository repository;
-
-    public CatalogService(CatalogRepository repository) {
-        this.repository = repository;
-    }
+    private final CatalogRepository repository;
 
     public List<Book> findByTitle(String title) {
         return repository.findAll()
                 .stream()
-                .filter(book -> book.title.startsWith(title))
+                .filter(book -> book.getTitle().startsWith(title))
                 .collect(Collectors.toList());
     }
 }
