@@ -26,7 +26,7 @@ public class MemoryOrderRepository implements OrderRepository {
             order.setCreateAt(LocalDateTime.now());
             storage.put(nextId, order);
         }
-        return null;
+        return order;
     }
 
     @Override
@@ -34,7 +34,7 @@ public class MemoryOrderRepository implements OrderRepository {
         return new ArrayList<>(storage.values());
     }
 
-    private long nextId() {
-        return ID_NEXT_VALUE.getAndIncrement();
+    private Long nextId() {
+        return ID_NEXT_VALUE.incrementAndGet();
     }
 }

@@ -11,9 +11,11 @@ import java.util.Optional;
 import static java.util.Collections.emptyList;
 
 public interface CatalogUseCase {
+    List<Book> findAll();
+
     List<Book> findByTitle(String title);
 
-    List<Book> findAll();
+    Optional<Book> findOneByTitle(String title);
 
     Optional<Book> findOneByTitleAndAuthor(String title, String author);
 
@@ -29,6 +31,10 @@ public interface CatalogUseCase {
         String author;
         Integer year;
         BigDecimal price;
+
+        public Book toBook() {
+            return new Book(title, author, year, price);
+        }
     }
 
     @Value
