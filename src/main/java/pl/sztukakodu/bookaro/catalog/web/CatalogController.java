@@ -8,6 +8,7 @@ import pl.sztukakodu.bookaro.catalog.application.port.CatalogUseCase;
 import pl.sztukakodu.bookaro.catalog.domain.Book;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequestMapping("/catalog")
 @RestController
@@ -17,12 +18,22 @@ public class CatalogController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<Book> getAll() {
+    public List<Book> getAll(
+            @RequestParam Optional<String> title,
+            @RequestParam Optional<String> author) {
+        if (title.isPresent() && author.isPresent()) {
+            return catolog.findByTitleAndAuthor(title.get(), author.get());
+        }
+        else if (title.isPresent()) {
+            return catolog.findByTitle(title.get());
+        }
+        else if (author.isPresent()) {
+            return catolog.findByAuthor(author.get());
+        }
         return catolog.findAll();
     }
 
-    @GetMapping("/{id}")
-
+        @GetMapping("/{id}")
 //    public ResponseEntity<?> getById(@PathVariable Long id) {
     public ResponseEntity<Book> getById(@PathVariable Long id) {
         return catolog
