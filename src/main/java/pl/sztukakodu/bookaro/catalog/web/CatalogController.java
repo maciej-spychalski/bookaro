@@ -1,10 +1,9 @@
 package pl.sztukakodu.bookaro.catalog.web;
 
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import pl.sztukakodu.bookaro.catalog.application.port.CatalogUseCase;
 import pl.sztukakodu.bookaro.catalog.domain.Book;
 
@@ -17,12 +16,20 @@ public class CatalogController {
     private final CatalogUseCase catolog;
 
     @GetMapping
+    @ResponseStatus(HttpStatus.OK)
     public List<Book> getAll() {
         return catolog.findAll();
     }
 
     @GetMapping("/{id}")
-    public Book getById(@PathVariable Long id) {
-        return catolog.findById(id).orElse(null);
+
+//    public ResponseEntity<?> getById(@PathVariable Long id) {
+    public ResponseEntity<Book> getById(@PathVariable Long id) {
+        return catolog
+                .findById(id)
+//                .map(book -> ResponseEntity.ok(book))
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
+
 }
