@@ -4,8 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pl.sztukakodu.bookaro.catalog.application.port.CatalogUseCase;
 import pl.sztukakodu.bookaro.catalog.application.port.CatalogUseCase.CreateBookCommand;
@@ -17,8 +17,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.net.URI;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RequestMapping("/catalog")
 @RestController
@@ -69,14 +68,14 @@ public class CatalogController {
 
     @Data
     private static class RestCreateBookCommand {
-        @NotBlank
+        @NotBlank(message = "Please provide a title")
         private String title;
-        @NotBlank
+        @NotBlank(message = "Please provide an author")
         private String author;
-        @NotNull
+        @NotNull(message = "Please provide valid year")
         private Integer year;
-        @NotNull
-        @DecimalMin("0.00")
+        @NotNull(message = "Please provide valid price")
+        @DecimalMin(value = "0.00", message = "Price must be grater than or equal to 0.00")
         private BigDecimal price;
 
         CreateBookCommand toCommand() {
