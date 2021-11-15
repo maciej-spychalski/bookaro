@@ -60,6 +60,12 @@ public class CatalogController {
                 .fromCurrentRequestUri().path("/" + book.getId().toString()).build().toUri();
     }
 
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteById(@PathVariable Long id) {
+        catolog.removeById(id);
+    }
+
     @Data
     private static class RestCreateBookCommand {
         private String title;
