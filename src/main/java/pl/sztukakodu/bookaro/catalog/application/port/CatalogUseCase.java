@@ -30,20 +30,30 @@ public interface CatalogUseCase {
 
     void removeById(long id);
 
+    void updateBookCover(UpdateBookCoverCommand command);
+
     UpdateBookResponse updateBook(UpdateBookCommand command);
+
+    @Value
+    class UpdateBookCoverCommand {
+        Long id;
+        byte[] file;
+        String contentType;
+        String filename;
+    }
 
     @Value
     class CreateBookCommand {
         String title;
         String author;
         Integer year;
-        BigDecimal price;
 
+        BigDecimal price;
         public Book toBook() {
             return new Book(title, author, year, price);
         }
-    }
 
+    }
     @Value
     @Builder
     @AllArgsConstructor
@@ -52,8 +62,8 @@ public interface CatalogUseCase {
         String title;
         String author;
         Integer year;
-        BigDecimal price;
 
+        BigDecimal price;
         public Book updateFields(Book book) {
             if (title != null) {
                 book.setTitle(title);
@@ -69,12 +79,13 @@ public interface CatalogUseCase {
             }
             return book;
         }
-    }
 
+    }
     @Value
     class UpdateBookResponse {
         public static UpdateBookResponse SUCCESS = new UpdateBookResponse(true, emptyList());
         boolean success;
         List<String> errors;
+
     }
 }
