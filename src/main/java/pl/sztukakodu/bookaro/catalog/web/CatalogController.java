@@ -9,6 +9,8 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pl.sztukakodu.bookaro.catalog.application.port.CatalogUseCase;
 import pl.sztukakodu.bookaro.catalog.application.port.CatalogUseCase.CreateBookCommand;
+import pl.sztukakodu.bookaro.catalog.application.port.CatalogUseCase.UpdateBookCommand;
+import pl.sztukakodu.bookaro.catalog.application.port.CatalogUseCase.UpdateBookResponse;
 import pl.sztukakodu.bookaro.catalog.domain.Book;
 
 import javax.validation.Valid;
@@ -48,10 +50,20 @@ public class CatalogController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void updateBook(@PathVariable Long id, @Valid @RequestBody RestBookCommand command) {
+        UpdateBookResponse response = catolog.updateBook(command.toUpdateCommand(id));
+        if(!response.isSuccess()) {
+            String message = String.join(", ", response.getErrors());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
+        }
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Void> addBook(@Valid @RequestBody RestCreateBookCommand command) {
-        Book book = catolog.addBook(command.toCommand());
+    public ResponseEntity<Void> addBook(@Valid @RequestBody RestBookCommand command) {
+        Book book = catolog.addBook(command.toCreateCommand());
         return ResponseEntity.created(createdBookUri(book)).build();
     }
 
@@ -67,7 +79,7 @@ public class CatalogController {
     }
 
     @Data
-    private static class RestCreateBookCommand {
+    private static class RestBookCommand {
         @NotBlank(message = "Please provide a title")
         private String title;
         @NotBlank(message = "Please provide an author")
@@ -78,10 +90,14 @@ public class CatalogController {
         @DecimalMin(value = "0.00", message = "Price must be grater than or equal to 0.00")
         private BigDecimal price;
 
-        CreateBookCommand toCommand() {
+        CreateBookCommand toCreateCommand() {
             return new CreateBookCommand(
                     title, author, year, price
             );
+        }
+
+        UpdateBookCommand toUpdateCommand(Long id) {
+            return new UpdateBookCommand(id, title, author, year, price);
         }
     }
 
