@@ -3,6 +3,7 @@ package pl.sztukakodu.bookaro.catalog.web;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -63,25 +64,9 @@ public class CatalogController {
         }
     }
 
-//    @PutMapping("/{id}/cover")
-//    @ResponseStatus(HttpStatus.ACCEPTED)
-//    public void addBookCover(@PathVariable Long id, @RequestParam("file") MultipartFile file) throws IOException {
-//        System.out.println("Got file: " + file.getOriginalFilename());
-//        catolog.updateBookCover(new UpdateBookCoverCommand(
-//                id,
-//                file.getBytes(),
-//                file.getContentType(),
-//                file.getOriginalFilename()
-//        ));
-//    }
-
     @PutMapping("/{id}/cover")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public void addBookCover(@PathVariable Long id,
-                             @RequestParam("file") MultipartFile file,
-                             @RequestParam("author") MultipartFile author) throws IOException {
-        file.getBytes()         - zapisuje nam plik od razu w tablicy byte'ów
-        file.getInputStream()   - to możemy wykorzystać tylko raz
+    public void addBookCover(@PathVariable Long id, @RequestParam("file") MultipartFile file) throws IOException {
         System.out.println("Got file: " + file.getOriginalFilename());
         catolog.updateBookCover(new UpdateBookCoverCommand(
                 id,

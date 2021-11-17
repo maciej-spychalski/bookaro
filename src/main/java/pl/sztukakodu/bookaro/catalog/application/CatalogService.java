@@ -5,16 +5,21 @@ import org.springframework.stereotype.Service;
 import pl.sztukakodu.bookaro.catalog.application.port.CatalogUseCase;
 import pl.sztukakodu.bookaro.catalog.domain.Book;
 import pl.sztukakodu.bookaro.catalog.domain.CatalogRepository;
+import pl.sztukakodu.bookaro.uploads.application.port.UploadUseCase;
+import pl.sztukakodu.bookaro.uploads.domain.Upload;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static pl.sztukakodu.bookaro.uploads.application.port.UploadUseCase.*;
+
 @Service
 @RequiredArgsConstructor
 class CatalogService implements CatalogUseCase {
     private final CatalogRepository repository;
+    private final UploadUseCase upload;
 
     @Override
     public List<Book> findAll() {
@@ -80,14 +85,26 @@ class CatalogService implements CatalogUseCase {
 
     }
 
+//    @Override
+//    public void updateBookCover(UpdateBookCoverCommand command) {
+//        repository.findById(command.getId())
+//                .ifPresent(book -> {
+//                    Upload savedUpload = upload.save(new SaveUploadCommand(
+//                            command.getFilename(),
+//                            command.getFile(),
+//                            command.getContentType()));
+//                    book.setCoverId(savedUpload.getId());
+//                    repository.save(book);
+//                });
+//    }
+
     @Override
     public void updateBookCover(UpdateBookCoverCommand command) {
-        int length = command.getFile().length;
-        System.out.println("Received cover command: " + command.getFilename()
-                + " byte: " + length);
         repository.findById(command.getId())
                 .ifPresent(book -> {
-//                    book.setCoverId();
+                    Upload savedUpload = upload.save(new SaveUploadCommand(command.getFilename(), command.getFile(), command.getContentType()));
+                    book.setCoverId(savedUpload.getId());
+                    repository.save(book);
                 });
     }
 
@@ -99,7 +116,7 @@ class CatalogService implements CatalogUseCase {
                     repository.save(updatedBook);
                     return UpdateBookResponse.SUCCESS;
                 })
-                .orElseGet(() -> new UpdateBookResponse(false, Arrays.asList("Book not found with id: " +command.getId())));
+                .orElseGet(() -> new UpdateBookResponse(false, Arrays.asList("Book not found with id: " + command.getId())));
     }
 
 }
