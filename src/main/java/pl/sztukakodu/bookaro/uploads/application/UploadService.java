@@ -7,6 +7,7 @@ import pl.sztukakodu.bookaro.uploads.domain.Upload;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -27,5 +28,10 @@ public class UploadService implements UploadUseCase {
         System.out.println("Upload saved: " + upload.getFilename() +
                 " with id: " + newId);
         return upload;
+    }
+
+    @Override
+    public Optional<Upload> getById(String id) {
+         return Optional.ofNullable(storage.get(id));
     }
 }
