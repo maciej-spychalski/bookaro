@@ -85,26 +85,28 @@ class CatalogService implements CatalogUseCase {
 
     }
 
-//    @Override
-//    public void updateBookCover(UpdateBookCoverCommand command) {
-//        repository.findById(command.getId())
-//                .ifPresent(book -> {
-//                    Upload savedUpload = upload.save(new SaveUploadCommand(
-//                            command.getFilename(),
-//                            command.getFile(),
-//                            command.getContentType()));
-//                    book.setCoverId(savedUpload.getId());
-//                    repository.save(book);
-//                });
-//    }
-
     @Override
     public void updateBookCover(UpdateBookCoverCommand command) {
         repository.findById(command.getId())
                 .ifPresent(book -> {
-                    Upload savedUpload = upload.save(new SaveUploadCommand(command.getFilename(), command.getFile(), command.getContentType()));
+                    Upload savedUpload = upload.save(new SaveUploadCommand(
+                            command.getFilename(),
+                            command.getFile(),
+                            command.getContentType()));
                     book.setCoverId(savedUpload.getId());
                     repository.save(book);
+                });
+    }
+
+    @Override
+    public void removeBookCover(Long id) {
+        repository.findById(id)
+                .ifPresent(book -> {
+                    if (book.getCoverId() != null) {
+                        upload.removeById(book.getCoverId());
+                        book.setCoverId(null);
+                        repository.save(book);
+                    }
                 });
     }
 
