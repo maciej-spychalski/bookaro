@@ -64,7 +64,7 @@ public class CatalogController {
         }
     }
 
-    @PutMapping("/{id}/cover")
+    @PutMapping(value = "/{id}/cover",consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void addBookCover(@PathVariable Long id, @RequestParam("file") MultipartFile file) throws IOException {
         System.out.println("Got file: " + file.getOriginalFilename());
