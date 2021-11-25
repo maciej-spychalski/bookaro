@@ -1,24 +1,36 @@
 package pl.sztukakodu.bookaro.order.domain;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
 @Builder
+@Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "orders")
 public class Order {
-    private Long id;
-    @Builder.Default
-    private OrderStatus status = OrderStatus.NEW;
-    private List<OrderItem> items;
-    private Recipient recipient;
-    private LocalDateTime createAt;
 
-    public BigDecimal totalPrice() {
-        return items.stream()
-                .map(item -> item.getBook().getPrice().multiply(new BigDecimal(item.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status = OrderStatus.NEW;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "order_id")
+    private List<OrderItem> items;
+
+    private transient Recipient recipient;
+
+    private LocalDateTime createdAt;
+
 }

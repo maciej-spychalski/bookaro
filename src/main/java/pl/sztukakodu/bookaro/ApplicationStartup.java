@@ -8,8 +8,9 @@ import pl.sztukakodu.bookaro.catalog.application.port.CatalogUseCase.CreateBookC
 import pl.sztukakodu.bookaro.catalog.application.port.CatalogUseCase.UpdateBookCommand;
 import pl.sztukakodu.bookaro.catalog.application.port.CatalogUseCase.UpdateBookResponse;
 import pl.sztukakodu.bookaro.catalog.domain.Book;
-import pl.sztukakodu.bookaro.order.application.port.PlaceOrderUseCase;
-import pl.sztukakodu.bookaro.order.application.port.PlaceOrderUseCase.PlaceOrderCommand;
+import pl.sztukakodu.bookaro.order.application.port.ManipulateOrderUseCase;
+import pl.sztukakodu.bookaro.order.application.port.ManipulateOrderUseCase.PlaceOrderCommand;
+import pl.sztukakodu.bookaro.order.application.port.ManipulateOrderUseCase.PlaceOrderResponse;
 import pl.sztukakodu.bookaro.order.application.port.QueryOrderUseCase;
 import pl.sztukakodu.bookaro.order.domain.OrderItem;
 import pl.sztukakodu.bookaro.order.domain.Recipient;
@@ -17,27 +18,28 @@ import pl.sztukakodu.bookaro.order.domain.Recipient;
 import java.math.BigDecimal;
 import java.util.List;
 
-import static pl.sztukakodu.bookaro.order.application.port.PlaceOrderUseCase.*;
-
 @Component
-public class ApplicationStartup implements CommandLineRunner {
+class ApplicationStartup implements CommandLineRunner {
+
     private final CatalogUseCase catalog;
-    private final PlaceOrderUseCase placeOrder;
+    private final ManipulateOrderUseCase placeOrder;
     private final QueryOrderUseCase queryOrder;
     private final String title;
     private final Long limit;
 
     public ApplicationStartup(
             CatalogUseCase catalog,
-            PlaceOrderUseCase placeOrder,
+            ManipulateOrderUseCase placeOrder,
             QueryOrderUseCase queryOrder,
             @Value("${bookaro.catalog.query.title}") String title,
-            @Value("${bookaro.catalog.query.limit}") Long time) {
+            @Value("${bookaro.catalog.query.author}") String author,
+            @Value("${bookaro.catalog.query.limit}") Long limit
+    ) {
         this.catalog = catalog;
         this.placeOrder = placeOrder;
         this.queryOrder = queryOrder;
         this.title = title;
-        this.limit = time;
+        this.limit = limit;
     }
 
     @Override
@@ -48,35 +50,39 @@ public class ApplicationStartup implements CommandLineRunner {
     }
 
     private void placeOrder() {
-        Book panTadeusz = catalog.findOneByTitle("Pan Tadeusz").orElseThrow(
-                () -> new IllegalStateException("Cannot fina a book"));
-        Book chlopi = catalog.findOneByTitle("Chłopi").orElseThrow(
-                () -> new IllegalStateException("Cannot fina a book"));
+        Book panTadeusz = catalog.findOneByTitle("Pan Tadeusz")
+                .orElseThrow(() -> new IllegalStateException("Cannot find a book"));
+        Book chlopi = catalog.findOneByTitle("Chłopi")
+                .orElseThrow(() -> new IllegalStateException("Cannot find a book"));
 
+        // create recipient
         Recipient recipient = Recipient
                 .builder()
                 .name("Jan Kowalski")
-                .phone("+48 888 777 999")
-                .street("Puławska 333")
-                .city("Ciechocinek")
-                .zipCode("13-001")
-                .email("j.kowalski@jk.com")
+                .phone("123-456-789")
+                .street("Armii Krajowej 31")
+                .city("Krakow")
+                .zipCode("30-150")
+                .email("jan@example.org")
                 .build();
 
         PlaceOrderCommand command = PlaceOrderCommand
                 .builder()
                 .recipient(recipient)
-                .item(new OrderItem(panTadeusz, 4))
-                .item(new OrderItem(chlopi, 3))
+                .item(new OrderItem(panTadeusz.getId(), 16))
+                .item(new OrderItem(chlopi.getId(), 7))
                 .build();
 
         PlaceOrderResponse response = placeOrder.placeOrder(command);
-        System.out.println("Create ORDER with id: " + response.getOrderId());
+        String result = response.handle(
+                orderId -> "Created ORDER with id: " + orderId,
+                error -> "Failed to created order: " + error
+        );
+        System.out.println(result);
 
+        // list all orders
         queryOrder.findAll()
-                .forEach(order -> {
-                    System.out.println("GOT ORDER WITH TOTAL PRICE: " + order.totalPrice() + " DETAILS: " + order);
-                });
+                .forEach(order -> System.out.println("GOT ORDER WITH TOTAL PRICE: " + order.totalPrice() + " DETAILS: " + order));
     }
 
     private void searchCatalog() {
@@ -86,24 +92,24 @@ public class ApplicationStartup implements CommandLineRunner {
     }
 
     private void initData() {
-        catalog.addBook(new CreateBookCommand("Pan Tadeusz", "Adam Mickiewicz", 1834, new BigDecimal("29.99")));
-        catalog.addBook(new CreateBookCommand("Ogniem i Mieczem", "Henryk Sienkiewicz", 1884, new BigDecimal("34.99")));
-        catalog.addBook(new CreateBookCommand("Chłopi", "Władysław Reymont", 1904, new BigDecimal("25.00")));
-        catalog.addBook(new CreateBookCommand("Pan Wołodyjski", "Henryk Sienkiewicz", 1899, new BigDecimal("32.99")));
+        catalog.addBook(new CreateBookCommand("Pan Tadeusz", "Adam Mickiewicz", 1834, new BigDecimal("19.90")));
+        catalog.addBook(new CreateBookCommand("Ogniem i Mieczem", "Henryk Sienkiewicz", 1884, new BigDecimal("29.90")));
+        catalog.addBook(new CreateBookCommand("Chłopi", "Władysław Reymont", 1904, new BigDecimal("11.90")));
+        catalog.addBook(new CreateBookCommand("Pan Wołodyjowski", "Henryk Sienkiewicz", 1899, new BigDecimal("14.90")));
     }
 
     private void findByTitle() {
-        List<Book> booksByTitle = catalog.findByTitle(title);
-        booksByTitle.stream().limit(limit).forEach(System.out::println);
+        List<Book> books = catalog.findByTitle(title);
+        books.forEach(System.out::println);
     }
 
     private void findAndUpdate() {
-        System.out.println("Updating book ...");
         catalog.findOneByTitleAndAuthor("Pan Tadeusz", "Adam Mickiewicz")
                 .ifPresent(book -> {
-                    UpdateBookCommand command = UpdateBookCommand.builder()
+                    UpdateBookCommand command = UpdateBookCommand
+                            .builder()
                             .id(book.getId())
-                            .title("Pan Tadeusz, czyli ostatni zajazd na Litwie")
+                            .title("Pan Tadeusz, czyli Ostatni Zajazd na Litwie")
                             .build();
                     UpdateBookResponse response = catalog.updateBook(command);
                     System.out.println("Updating book result: " + response.isSuccess());

@@ -3,8 +3,8 @@ package pl.sztukakodu.bookaro.catalog.application;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.sztukakodu.bookaro.catalog.application.port.CatalogUseCase;
+import pl.sztukakodu.bookaro.catalog.db.BookJpaRepository;
 import pl.sztukakodu.bookaro.catalog.domain.Book;
-import pl.sztukakodu.bookaro.catalog.domain.CatalogRepository;
 import pl.sztukakodu.bookaro.uploads.application.port.UploadUseCase;
 import pl.sztukakodu.bookaro.uploads.domain.Upload;
 
@@ -18,7 +18,7 @@ import static pl.sztukakodu.bookaro.uploads.application.port.UploadUseCase.*;
 @Service
 @RequiredArgsConstructor
 class CatalogService implements CatalogUseCase {
-    private final CatalogRepository repository;
+    private final BookJpaRepository repository;
     private final UploadUseCase upload;
 
     @Override
@@ -81,8 +81,7 @@ class CatalogService implements CatalogUseCase {
 
     @Override
     public void removeById(long id) {
-        repository.removeById(id);
-
+        repository.deleteById(id);
     }
 
     @Override

@@ -1,16 +1,16 @@
 package pl.sztukakodu.bookaro.order.application;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import pl.sztukakodu.bookaro.order.application.port.PlaceOrderUseCase;
+import pl.sztukakodu.bookaro.order.application.port.ManipulateOrderUseCase;
+import pl.sztukakodu.bookaro.order.db.OrderJpaRepository;
 import pl.sztukakodu.bookaro.order.domain.Order;
-import pl.sztukakodu.bookaro.order.domain.OrderRepository;
 import pl.sztukakodu.bookaro.order.domain.OrderStatus;
 
 @Service
-@AllArgsConstructor
-public class PlaceOrderService implements PlaceOrderUseCase {
-    private final OrderRepository repository;
+@RequiredArgsConstructor
+class ManipulateOrderService implements ManipulateOrderUseCase {
+    private final OrderJpaRepository repository;
 
     @Override
     public PlaceOrderResponse placeOrder(PlaceOrderCommand command) {
@@ -24,9 +24,16 @@ public class PlaceOrderService implements PlaceOrderUseCase {
     }
 
     @Override
+    public void deleteOrderById(Long id) {
+        repository.deleteById(id);
+    }
+
+    @Override
     public void updateOrderStatus(Long id, OrderStatus status) {
-        Order order = repository.findById(id).orElse(null);
-        order.setStatus(status);
-        repository.save(order);
+        repository.findById(id)
+                .ifPresent(order -> {
+                    order.setStatus(status);
+                    repository.save(order);
+                });
     }
 }

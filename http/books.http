@@ -1,0 +1,4 @@
+GET http://localhost:8080/catalog
+
+###
+GET http://localhost:8080/catalog/1
