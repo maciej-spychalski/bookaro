@@ -10,9 +10,9 @@ public interface UploadUseCase {
 
     Upload save(SaveUploadCommand command);
 
-    Optional<Upload> getById(String id);
+    Optional<Upload> getById(Long id);
 
-    void removeById(String id);
+    void removeById(Long id);
 
     @Value
     @AllArgsConstructor
