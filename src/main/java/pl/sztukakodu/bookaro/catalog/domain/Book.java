@@ -12,10 +12,10 @@ import java.util.Set;
 
 @Getter
 @Setter
-@ToString
 @RequiredArgsConstructor
 @Entity
 @EntityListeners(AuditingEntityListener.class)
+@ToString(exclude = "authors")
 public class Book {
     @Id
     @GeneratedValue
