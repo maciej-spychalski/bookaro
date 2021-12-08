@@ -5,6 +5,7 @@ import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import pl.sztukakodu.bookaro.jpa.BaseEntity;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -18,10 +19,8 @@ import java.util.Set;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @ToString(exclude = "authors")
-public class Book {
-    @Id
-    @GeneratedValue
-    private Long id;
+public class Book extends BaseEntity {
+
     private String title;
 
     @ManyToMany(fetch = FetchType.EAGER)
