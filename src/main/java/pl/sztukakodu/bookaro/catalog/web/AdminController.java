@@ -1,38 +1,34 @@
-package pl.sztukakodu.bookaro;
+package pl.sztukakodu.bookaro.catalog.web;
 
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import pl.sztukakodu.bookaro.catalog.application.port.CatalogUseCase;
-import pl.sztukakodu.bookaro.catalog.application.port.CatalogUseCase.CreateBookCommand;
-import pl.sztukakodu.bookaro.catalog.application.port.CatalogUseCase.UpdateBookCommand;
-import pl.sztukakodu.bookaro.catalog.application.port.CatalogUseCase.UpdateBookResponse;
 import pl.sztukakodu.bookaro.catalog.db.AuthorJpaRepository;
 import pl.sztukakodu.bookaro.catalog.domain.Author;
 import pl.sztukakodu.bookaro.catalog.domain.Book;
 import pl.sztukakodu.bookaro.order.application.port.ManipulateOrderUseCase;
-import pl.sztukakodu.bookaro.order.application.port.ManipulateOrderUseCase.PlaceOrderCommand;
-import pl.sztukakodu.bookaro.order.application.port.ManipulateOrderUseCase.PlaceOrderResponse;
 import pl.sztukakodu.bookaro.order.application.port.QueryOrderUseCase;
 import pl.sztukakodu.bookaro.order.domain.OrderItem;
 import pl.sztukakodu.bookaro.order.domain.Recipient;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Set;
 
-@Component
+@RestController
 @AllArgsConstructor
-class ApplicationStartup implements CommandLineRunner {
-
+@RequestMapping("/admin")
+public class AdminController {
     private final CatalogUseCase catalog;
     private final ManipulateOrderUseCase placeOrder;
     private final QueryOrderUseCase queryOrder;
     private final AuthorJpaRepository authorJpaRepository;
 
-    @Override
-    public void run(String... args) {
+//    @Transactional
+    @PostMapping("/data")
+    public void initialize() {
         initData();
         placeOrder();
     }
@@ -54,14 +50,18 @@ class ApplicationStartup implements CommandLineRunner {
                 .email("jan@example.org")
                 .build();
 
-        PlaceOrderCommand command = PlaceOrderCommand
+        if (true) {
+            throw new IllegalStateException("POISON!!!");
+        }
+
+        ManipulateOrderUseCase.PlaceOrderCommand command = ManipulateOrderUseCase.PlaceOrderCommand
                 .builder()
                 .recipient(recipient)
                 .item(new OrderItem(effectiveJava.getId(), 16))
                 .item(new OrderItem(javaPuzzlers.getId(), 7))
                 .build();
 
-        PlaceOrderResponse response = placeOrder.placeOrder(command);
+        ManipulateOrderUseCase.PlaceOrderResponse response = placeOrder.placeOrder(command);
         String result = response.handle(
                 orderId -> "Created ORDER with id: " + orderId,
                 error -> "Failed to created order: " + error
@@ -79,13 +79,13 @@ class ApplicationStartup implements CommandLineRunner {
         authorJpaRepository.save(joshua);
         authorJpaRepository.save(neal);
 
-        CreateBookCommand effectiveJava = new CreateBookCommand(
+        CatalogUseCase.CreateBookCommand effectiveJava = new CatalogUseCase.CreateBookCommand(
                 "Effective Java",
                 Set.of(joshua.getId()),
                 2005,
                 new BigDecimal("79.00")
         );
-        CreateBookCommand javaPuzzlers = new CreateBookCommand(
+        CatalogUseCase.CreateBookCommand javaPuzzlers = new CatalogUseCase.CreateBookCommand(
                 "Java Puzzlers",
                 Set.of(joshua.getId(), neal.getId()),
                 2018,
@@ -95,5 +95,4 @@ class ApplicationStartup implements CommandLineRunner {
         catalog.addBook(effectiveJava);
         catalog.addBook(javaPuzzlers);
     }
-
 }
