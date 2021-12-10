@@ -26,7 +26,7 @@ public class AdminController {
     private final QueryOrderUseCase queryOrder;
     private final AuthorJpaRepository authorJpaRepository;
 
-//    @Transactional
+    @Transactional
     @PostMapping("/data")
     public void initialize() {
         initData();
@@ -49,10 +49,6 @@ public class AdminController {
                 .zipCode("30-150")
                 .email("jan@example.org")
                 .build();
-
-        if (true) {
-            throw new IllegalStateException("POISON!!!");
-        }
 
         ManipulateOrderUseCase.PlaceOrderCommand command = ManipulateOrderUseCase.PlaceOrderCommand
                 .builder()
