@@ -28,7 +28,8 @@ class CatalogService implements CatalogUseCase {
 
     @Override
     public List<Book> findAll() {
-        return repository.findAll();
+        return repository.findAllEager();
+//        return repository.findAll();
     }
 
     @Override
