@@ -49,6 +49,7 @@ public interface CatalogUseCase {
         Set<Long> authors;
         Integer year;
         BigDecimal price;
+        Long available;
     }
 
     @Value
@@ -60,6 +61,7 @@ public interface CatalogUseCase {
         Set<Long> authors;
         Integer year;
         BigDecimal price;
+        Long available;
     }
 
     @Value
