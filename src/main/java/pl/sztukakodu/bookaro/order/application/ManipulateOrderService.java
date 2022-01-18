@@ -7,9 +7,11 @@ import pl.sztukakodu.bookaro.catalog.db.BookJpaRepository;
 import pl.sztukakodu.bookaro.catalog.domain.Book;
 import pl.sztukakodu.bookaro.order.application.port.ManipulateOrderUseCase;
 import pl.sztukakodu.bookaro.order.db.OrderJpaRepository;
+import pl.sztukakodu.bookaro.order.db.RecipientJpaRepository;
 import pl.sztukakodu.bookaro.order.domain.Order;
 import pl.sztukakodu.bookaro.order.domain.OrderItem;
 import pl.sztukakodu.bookaro.order.domain.OrderStatus;
+import pl.sztukakodu.bookaro.order.domain.Recipient;
 
 
 import java.util.Set;
@@ -21,6 +23,7 @@ import java.util.stream.Collectors;
 class ManipulateOrderService implements ManipulateOrderUseCase {
     private final OrderJpaRepository repository;
     private final BookJpaRepository bookJpaRepository;
+    private final RecipientJpaRepository recipientJpaRepository;
 
     @Override
     public PlaceOrderResponse placeOrder(PlaceOrderCommand command) {
@@ -30,12 +33,22 @@ class ManipulateOrderService implements ManipulateOrderUseCase {
                 .collect(Collectors.toSet());
         Order order = Order
                 .builder()
-                .recipient(command.getRecipient())
+                .recipient(getOrCreateRecipient(command.getRecipient()))
                 .items(items)
                 .build();
         Order save = repository.save(order);
         bookJpaRepository.saveAll(updateBook(items));
         return PlaceOrderResponse.success(save.getId());
+    }
+
+    private Recipient getOrCreateRecipient(Recipient recipient) {
+        return recipientJpaRepository
+                .findByEmailIgnoreCase(recipient.getEmail())
+                .orElse(recipient);
+    }
+
+    private Recipient getRecipient(PlaceOrderCommand command) {
+        return command.getRecipient();
     }
 
     private Set<Book> updateBook(Set<OrderItem> items) {
