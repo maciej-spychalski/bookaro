@@ -8,39 +8,39 @@ import java.util.Optional;
 public enum OrderStatus {
     NEW {
         @Override
-        public OrderStatus updateStatus(OrderStatus status) {
+        public UpdateStatusResult updateStatus(OrderStatus status) {
             return switch (status) {
-                case PAID -> PAID;
-                case CANCELED -> CANCELED;
-                case ABANDONED -> ABANDONED;
+                case PAID -> UpdateStatusResult.ok(PAID);
+                case CANCELED -> UpdateStatusResult.revoked(CANCELED);
+                case ABANDONED -> UpdateStatusResult.revoked(ABANDONED);
                 default -> super.updateStatus(status);
             };
         }
     },
     PAID {
         @Override
-        public OrderStatus updateStatus(OrderStatus status) {
+        public UpdateStatusResult updateStatus(OrderStatus status) {
             if (status == SHIPPED) {
-                return SHIPPED;
+                return UpdateStatusResult.ok(SHIPPED);
             }
             return super.updateStatus(status);
         }
     },
     CANCELED {
         @Override
-        public OrderStatus updateStatus(OrderStatus status) {
+        public UpdateStatusResult updateStatus(OrderStatus status) {
             return super.updateStatus(status);
         }
     },
     ABANDONED {
         @Override
-        public OrderStatus updateStatus(OrderStatus status) {
+        public UpdateStatusResult updateStatus(OrderStatus status) {
             return super.updateStatus(status);
         }
     },
     SHIPPED {
         @Override
-        public OrderStatus updateStatus(OrderStatus status) {
+        public UpdateStatusResult updateStatus(OrderStatus status) {
             return super.updateStatus(status);
         }
     };
@@ -51,7 +51,7 @@ public enum OrderStatus {
                 .findFirst();
     }
 
-    public OrderStatus updateStatus(OrderStatus status) {
+    public UpdateStatusResult  updateStatus(OrderStatus status) {
         throw new IllegalArgumentException("Unable to mark " + this.name() + " order as " + status.name());
     }
 }
