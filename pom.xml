@@ -21,10 +21,15 @@
 		<commons.lang.version>3.12.0</commons.lang.version>
 		<springdoc.openapi.ui.version>1.5.12</springdoc.openapi.ui.version>
 		<postgres.version>42.3.1</postgres.version>
+		<opencsv.version>5.3</opencsv.version>
 	</properties>
 
 	<dependencies>
-
+		<dependency>
+			<groupId>com.opencsv</groupId>
+			<artifactId>opencsv</artifactId>
+			<version>${opencsv.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
