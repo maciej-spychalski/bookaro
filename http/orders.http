@@ -1,5 +1,5 @@
 ### Initialize Data
-POST http://localhost:8080/admin/data
+POST http://localhost:8080/admin/initialization
 
 ### Catalog
 GET http://localhost:8080/catalog

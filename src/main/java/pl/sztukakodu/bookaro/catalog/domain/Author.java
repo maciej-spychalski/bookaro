@@ -21,8 +21,8 @@ import java.util.Set;
 @ToString(exclude = "books")
 public class Author extends BaseEntity {
 
-    private String firstName;
-    private String lastName;
+    private String name;
+
 
     @ManyToMany(mappedBy = "authors", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JsonIgnoreProperties("authors")
@@ -34,9 +34,8 @@ public class Author extends BaseEntity {
     @LastModifiedDate
     private LocalDateTime updateAt;
 
-    public Author(String firstName, String lastName) {
-        this.firstName = firstName;
-        this.lastName = lastName;
+    public Author(String name) {
+        this.name = name;
     }
 
     public void addBook(Book book) {
