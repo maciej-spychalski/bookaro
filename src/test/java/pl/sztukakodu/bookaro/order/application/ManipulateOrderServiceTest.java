@@ -42,6 +42,26 @@ class ManipulateOrderServiceTest {
         assertTrue(response.isSuccess());
     }
 
+    @Test
+    public void userCantOrderMoreBooksThanAvailable() {
+        // Given
+        Book effectiveJava = givenEffectiveJava(5L);
+
+        PlaceOrderCommand command = PlaceOrderCommand
+                .builder()
+                .recipient(recipient())
+                .item(new OrderItemCommand(effectiveJava.getId(), 10))
+                .build();
+
+        // When
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            service.placeOrder(command);
+        });
+
+        // Then
+        assertTrue(exception.getMessage().contains("Too many copies of book " + effectiveJava.getId() + " requested"));
+    }
+
     private Book givenJavaConcurrency(long available) {
         return bookJpaRepository.save(new Book("Java Concurrency in Practice", 2006, new BigDecimal("99.90"), available));
     }
