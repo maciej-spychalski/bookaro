@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 @Transactional
 @RequiredArgsConstructor
 class ManipulateOrderService implements ManipulateOrderUseCase {
+
     private final OrderJpaRepository repository;
     private final BookJpaRepository bookJpaRepository;
     private final RecipientJpaRepository recipientJpaRepository;
