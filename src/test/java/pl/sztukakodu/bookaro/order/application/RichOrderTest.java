@@ -1,6 +1,5 @@
 package pl.sztukakodu.bookaro.order.application;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import pl.sztukakodu.bookaro.catalog.domain.Book;
 import pl.sztukakodu.bookaro.order.domain.OrderItem;
