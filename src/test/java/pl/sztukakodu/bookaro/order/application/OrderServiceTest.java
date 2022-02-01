@@ -1,5 +1,6 @@
 package pl.sztukakodu.bookaro.order.application;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -12,6 +13,7 @@ import pl.sztukakodu.bookaro.order.application.port.QueryOrderUseCase;
 import pl.sztukakodu.bookaro.order.domain.OrderStatus;
 import pl.sztukakodu.bookaro.order.domain.Recipient;
 
+import javax.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -59,7 +61,7 @@ class OrderServiceTest {
     public void UserCanRevokeOrder() {
         // Given
         Book effectiveJava = givenEffectiveJava(50L);
-        Long orderId = placeOrder(effectiveJava.getId(),15);
+        Long orderId = placeOrder(effectiveJava.getId(), 15);
         assertEquals(35L, availableCopiesOf(effectiveJava));
 
         // When
@@ -71,11 +73,83 @@ class OrderServiceTest {
 
     }
 
+    @Test
+    public void userCannotRevokePaidOrder() {
+        // Given
+        Book effectiveJava = givenEffectiveJava(50L);
+        Long orderId = placeOrder(effectiveJava.getId(), 15);
+        assertEquals(35L, availableCopiesOf(effectiveJava));
+        service.updateOrderStatus(orderId, OrderStatus.PAID);
+
+        // When
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            service.updateOrderStatus(orderId, OrderStatus.CANCELED);
+        });
+
+        // Then
+        assertTrue(exception.getMessage().contains("Unable to mark " + OrderStatus.PAID + " order as " + OrderStatus.CANCELED));
+    }
+
+    @Test
+    public void userCannotRevokeShippedOrder() {
+        // Given
+        Book effectiveJava = givenEffectiveJava(50L);
+        Long orderId = placeOrder(effectiveJava.getId(), 15);
+        assertEquals(35L, availableCopiesOf(effectiveJava));
+        service.updateOrderStatus(orderId, OrderStatus.PAID);
+        service.updateOrderStatus(orderId, OrderStatus.SHIPPED);
+
+        // When
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            service.updateOrderStatus(orderId, OrderStatus.CANCELED);
+        });
+
+        // Then
+        assertTrue(exception.getMessage().contains("Unable to mark " + OrderStatus.SHIPPED + " order as " + OrderStatus.CANCELED));
+    }
+
+    @Test
+    public void userCannotOrderNoExistingBooks() {
+        Book effectiveJava = givenEffectiveJava(50L);
+        Long bookId = effectiveJava.getId();
+        PlaceOrderCommand command = PlaceOrderCommand
+                .builder()
+                .recipient(recipient())
+                .item(new OrderItemCommand(bookId + 1, 15))
+                .build();
+
+        //then
+        assertThrows(EntityNotFoundException.class, () -> {
+            service.placeOrder(command);
+        });
+    }
+
+    @Test
+    public void userCannotOrderNegativeNumberOfBooks() {
+        Book effectiveJava = givenEffectiveJava(50L);
+        Long bookId = effectiveJava.getId();
+        PlaceOrderCommand command = PlaceOrderCommand
+                .builder()
+                .recipient(recipient())
+                .item(new OrderItemCommand(bookId, -15))
+                .build();
+
+        // When
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            service.placeOrder(command);;
+        });
+
+        // Then
+        assertTrue(exception.getMessage().contains("The number of copies of the requested book" + bookId +
+                " cannot be less than zero"));
+    }
+
     private Long placeOrder(Long bookId, int copies) {
         PlaceOrderCommand command = PlaceOrderCommand
                 .builder()
                 .recipient(recipient())
                 .item(new OrderItemCommand(bookId, copies))
+                .build();
         return service.placeOrder(command).getRight();
     }
 
