@@ -79,15 +79,26 @@ class ManipulateOrderService implements ManipulateOrderUseCase {
     }
 
     @Override
-    public void updateOrderStatus(Long id, OrderStatus status) {
-        repository.findById(id)
-                .ifPresent(order -> {
-                    UpdateStatusResult result = order.updateStatus(status);
+    public UpdateStatusResponse updateOrderStatus(UpdateStatusCommand command) {
+        return repository.findById(command.getOrderId())
+                .map(order -> {
+                    if(!hasAccess(command, order)) {
+                        return UpdateStatusResponse.failure("Unauthorized");
+                    }
+                    UpdateStatusResult result = order.updateStatus(command.getStatus());
                     if(result.isRevoked()) {
                         bookJpaRepository.saveAll(revokeBooks(order.getItems()));
                     }
                     repository.save(order);
-                });
+                    return UpdateStatusResponse.success(order.getStatus());
+                })
+                .orElse(UpdateStatusResponse.failure("Order not found"));
+    }
+
+    private boolean hasAccess(UpdateStatusCommand command, Order order) {
+        String email = command.getEmail();
+        return email.equalsIgnoreCase(order.getRecipient().getEmail()) ||
+                email.equalsIgnoreCase("adming@example.org");
     }
 
     private Set<Book> revokeBooks(Set<OrderItem> items) {
