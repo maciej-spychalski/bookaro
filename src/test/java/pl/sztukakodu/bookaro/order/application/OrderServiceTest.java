@@ -171,6 +171,43 @@ class OrderServiceTest {
     }
 
     @Test
+    // Todo-Maciek" poprawić w module security
+    public void adminCanRevokeOtherUsersOrder() {
+        // Given
+        Book effectiveJava = givenEffectiveJava(50L);
+        String marek = "marek@example.org ";
+        Long orderId = placeOrder(effectiveJava.getId(), 15, marek);
+        assertEquals(35L, availableCopiesOf(effectiveJava));
+
+        // When
+        String admin = "admin@example.org";
+        UpdateStatusCommand command = new UpdateStatusCommand(orderId, OrderStatus.CANCELED, admin);
+        service.updateOrderStatus(command);
+
+        // Then
+        assertEquals(50L, availableCopiesOf(effectiveJava));
+        assertEquals(OrderStatus.CANCELED, queryOrderService.findById(orderId).get().getStatus());
+    }
+
+    @Test
+    public void adminCanMarkOrderAsPaid() {
+        // Given
+        Book effectiveJava = givenEffectiveJava(50L);
+        String recipient = "marek@example.org";
+        Long orderId = placeOrder(effectiveJava.getId(), 15, recipient);
+        assertEquals(35L, availableCopiesOf(effectiveJava));
+
+        // When
+        String admin = "admin@example.org";
+        UpdateStatusCommand command = new UpdateStatusCommand(orderId, OrderStatus.PAID, admin);
+        service.updateOrderStatus(command);
+
+        // Then
+        assertEquals(35L, availableCopiesOf(effectiveJava));
+        assertEquals(OrderStatus.PAID, queryOrderService.findById(orderId).get().getStatus());
+    }
+
+    @Test
     public void userCantOrderMoreBooksThanAvailable() {
         // Given
         Book effectiveJava = givenEffectiveJava(5L);

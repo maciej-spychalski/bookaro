@@ -98,7 +98,7 @@ class ManipulateOrderService implements ManipulateOrderUseCase {
     private boolean hasAccess(UpdateStatusCommand command, Order order) {
         String email = command.getEmail();
         return email.equalsIgnoreCase(order.getRecipient().getEmail()) ||
-                email.equalsIgnoreCase("adming@example.org");
+                email.equalsIgnoreCase("admin@example.org");
     }
 
     private Set<Book> revokeBooks(Set<OrderItem> items) {
