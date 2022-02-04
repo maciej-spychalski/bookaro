@@ -9,6 +9,7 @@ import pl.sztukakodu.bookaro.catalog.application.port.CatalogUseCase;
 import pl.sztukakodu.bookaro.catalog.db.BookJpaRepository;
 import pl.sztukakodu.bookaro.catalog.domain.Book;
 import pl.sztukakodu.bookaro.order.application.port.QueryOrderUseCase;
+import pl.sztukakodu.bookaro.order.domain.Delivery;
 import pl.sztukakodu.bookaro.order.domain.OrderStatus;
 import pl.sztukakodu.bookaro.order.domain.Recipient;
 
@@ -241,41 +242,41 @@ class OrderServiceTest {
     @Test
     public void shippingCostsArDiscountedOver100zlotys() {
         // Given
-//        Book book = givenBook(50L, "49.90");
+        Book book = givenBook(50L, "49.90");
 
         // When
-//        Long orderId = placeOrder(book.getId(), 3);
+        Long orderId = placeOrder(book.getId(), 3);
 
         // Then
-//        RichOrder order = orderOf(orderId);
-//        assertEquals("149.70", order.getFinalPrice().toPlainString());
-//        assertEquals("149.70", order.getOrderPrice().getItemsPrice().toPlainString());
+        RichOrder order = orderOf(orderId);
+        assertEquals("149.70", order.getFinalPrice().toPlainString());
+        assertEquals("149.70", order.getOrderPrice().getItemsPrice().toPlainString());
     }
 
     @Test
     public void cheapestBookIsHalfPricedWhenTotalOver200zlotys() {
         // Given
-//        Book book = givenBook(50L, "49.90");
+        Book book = givenBook(50L, "49.90");
 
         // When
-//        Long orderId = placeOrder(book.getId(), 5);
+        Long orderId = placeOrder(book.getId(), 5);
 
         // Then
-//        RichOrder order = orderOf(orderId);
-//        assertEquals("224.55", order.getFinalPrice().toPlainString());
+        RichOrder order = orderOf(orderId);
+        assertEquals("224.55", order.getFinalPrice().toPlainString());
     }
 
     @Test
     public void cheapestBookIsFreeWhenTotalOver400zlotys() {
         // Given
-//        Book book = givenBook(50L, "49.90");
+        Book book = givenBook(50L, "49.90");
 
         // When
-//        Long orderId = placeOrder(book.getId(), 10);
+        Long orderId = placeOrder(book.getId(), 10);
 
         // Then
-//        RichOrder order = orderOf(orderId);
-//        assertEquals("449.10", orderOf(orderId).getFinalPrice().toPlainString());
+        RichOrder order = orderOf(orderId);
+        assertEquals("449.10", orderOf(orderId).getFinalPrice().toPlainString());
     }
 
     private  RichOrder orderOf(Long orderId) {
@@ -283,7 +284,7 @@ class OrderServiceTest {
     }
 
     private Book givenBook(long available, String price) {
-        return bookJpaRepository.save(new Book("Java Concurrency in Practice", 2006, new BigDecimal("99,90"), available));
+        return bookJpaRepository.save(new Book("Java Concurrency in Practice", 2006, new BigDecimal(price), available));
     }
 
     private Long placeOrder(Long bookId, int copies) {
@@ -295,6 +296,7 @@ class OrderServiceTest {
                 .builder()
                 .recipient(recipient(recipient))
                 .item(new OrderItemCommand(bookId, copies))
+                .deliver(Delivery.COURIER)
                 .build();
         return service.placeOrder(command).getRight();
     }
