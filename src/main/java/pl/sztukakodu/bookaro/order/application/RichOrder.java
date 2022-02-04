@@ -1,6 +1,7 @@
 package pl.sztukakodu.bookaro.order.application;
 
 import lombok.Value;
+import pl.sztukakodu.bookaro.order.application.price.OrderPrice;
 import pl.sztukakodu.bookaro.order.domain.OrderItem;
 import pl.sztukakodu.bookaro.order.domain.OrderStatus;
 import pl.sztukakodu.bookaro.order.domain.Recipient;
@@ -17,10 +18,7 @@ class RichOrder {
     Set<OrderItem> items;
     Recipient recipient;
     LocalDateTime createdAt;
+    OrderPrice orderPrice;
+    BigDecimal finalPrice;
 
-    public BigDecimal totalPrice() {
-        return items.stream()
-                .map(item -> item.getBook().getPrice().multiply(new BigDecimal(item.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
 }
