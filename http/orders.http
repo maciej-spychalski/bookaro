@@ -2,7 +2,7 @@
 POST http://localhost:8080/admin/initialization
 
 ### Catalog
-GET http://localhost:8080/catalog
+GET http://localhost:8080/orders
 
 ### ORDER
 POST http://localhost:8080/orders
