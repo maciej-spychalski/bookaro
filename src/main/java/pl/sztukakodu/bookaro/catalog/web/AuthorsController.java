@@ -16,7 +16,6 @@ import java.util.List;
 public class AuthorsController {
     private final AuthorsUseCase authors;
 
-    // kazdy uzytkowni
     @GetMapping
     public List<Author> findAll() {
         return authors.findAll();

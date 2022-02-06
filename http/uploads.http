@@ -1,0 +1,5 @@
+### UPLOADS
+GET http://localhost:8080/uploads/241
+
+### UPLOADS
+GET http://localhost:8080/uploads/241/file

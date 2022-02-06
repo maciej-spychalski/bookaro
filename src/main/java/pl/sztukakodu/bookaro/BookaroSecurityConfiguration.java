@@ -14,7 +14,8 @@ public class BookaroSecurityConfiguration extends WebSecurityConfigurerAdapter {
         // GET catalog, GET catalog/ID
         http
                 .authorizeRequests()
-                .mvcMatchers(HttpMethod.GET,"/catalog/**").permitAll()
+                .mvcMatchers(HttpMethod.GET,"/catalog/**", "/uploads/**", "/authors/**").permitAll()
+                .mvcMatchers(HttpMethod.POST,"/orders").permitAll()
                 .anyRequest().authenticated()
         .and()
                 .httpBasic()

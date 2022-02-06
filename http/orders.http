@@ -1,7 +1,4 @@
-### Initialize Data
-POST http://localhost:8080/admin/initialization
-
-### Catalog
+### ORDER
 GET http://localhost:8080/orders
 
 ### ORDER
@@ -11,11 +8,11 @@ Content-Type: application/json
 {
   "items": [
     {
-      "bookId": 3,
+      "bookId": 270,
       "quantity": 3
     },
     {
-      "bookId": 4,
+      "bookId": 231,
       "quantity": 3
     }
   ],

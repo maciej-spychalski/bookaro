@@ -1,0 +1,5 @@
+### Catalog
+GET http://localhost:8080/catalog
+
+### Catalog
+GET http://localhost:8080/catalog/240
