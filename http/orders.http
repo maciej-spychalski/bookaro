@@ -8,11 +8,11 @@ Content-Type: application/json
 {
   "items": [
     {
-      "bookId": 270,
-      "quantity": 3
+      "bookId": 297,
+      "quantity": 1
     },
     {
-      "bookId": 231,
+      "bookId": 371,
       "quantity": 3
     }
   ],
@@ -22,7 +22,7 @@ Content-Type: application/json
     "street": "Cwiartki 3/4",
     "city": "Krakow",
     "zipCode": "30-150",
-    "email": "johndoe@example.org"
+    "email": "marek@example"
   }
 }
 
