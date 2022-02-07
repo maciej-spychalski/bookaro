@@ -37,7 +37,6 @@ class OrdersController {
         return queryOrder.findAll();
     }
 
-    // konkretny uzytkownik - wlasciciel zamowienia
     @Secured({"ROLE_ADMIN", "ROLE_USER"})
     @GetMapping("/{id}")
     public ResponseEntity<RichOrder> getOrderById(@PathVariable Long id, @AuthenticationPrincipal User user) {
@@ -69,17 +68,20 @@ class OrdersController {
     }
 
     @Secured({"ROLE_ADMIN", "ROLE_USER"})
-    // wlasciciel zamowienia - anulowanie
     @PatchMapping("/{id}/status")
-    @ResponseStatus(ACCEPTED)
-    public void updateOrderStatus(@PathVariable Long id, @RequestBody Map<String, String> body) {
+    public ResponseEntity<Object> updateOrderStatus(@PathVariable Long id, @RequestBody Map<String, String> body,
+                                  @AuthenticationPrincipal User user) {
         String status = body.get("status");
         OrderStatus orderStatus = OrderStatus
                 .parseString(status)
                 .orElseThrow(() -> new ResponseStatusException(BAD_REQUEST, "Unknown status: " + status));
         // TODO-Maciek: naprawić w module security
-        UpdateStatusCommand command = new UpdateStatusCommand(id, orderStatus, "adming@example.org");
-        manipulateOrder.updateOrderStatus(command);
+        UpdateStatusCommand command = new UpdateStatusCommand(id, orderStatus, user);
+        return manipulateOrder.updateOrderStatus(command)
+                .handle(
+                        newStatus -> ResponseEntity.accepted().build(),
+                        error -> ResponseEntity.status(error.getStatus()).build()
+                );
     }
 
     @Secured({"ROLE_ADMIN"})
