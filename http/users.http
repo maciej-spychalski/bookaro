@@ -1,0 +1,17 @@
+### USERS
+
+
+###
+//@no-redirect
+POST localhost:8080/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "xxx"
+}
+
+
+
+###
+POST localhost:8080/logout

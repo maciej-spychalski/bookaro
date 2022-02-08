@@ -47,7 +47,6 @@ public class UploadsController {
                             .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
                             .contentType(MediaType.parseMediaType(file.getContentType()))
                             .body(resource);
-
                 }).orElse(ResponseEntity.notFound().build());
     }
 
