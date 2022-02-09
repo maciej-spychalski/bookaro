@@ -2,30 +2,57 @@
 GET http://localhost:8080/orders
 
 ### ORDER
+GET http://localhost:8080/orders/513
+
+### ORDER
 POST http://localhost:8080/orders
 Content-Type: application/json
 
 {
   "items": [
     {
-      "bookId": 297,
+      "bookId": 712,
       "quantity": 1
     },
     {
-      "bookId": 371,
-      "quantity": 3
+      "bookId": 715,
+      "quantity": 1
     }
   ],
   "recipient": {
-    "name": "John Doe",
+    "name": "Marek Kowalski",
     "phone": "123-456-789",
     "street": "Cwiartki 3/4",
     "city": "Krakow",
     "zipCode": "30-150",
-    "email": "marek@example"
+    "email": "marek@example.org"
   }
 }
 
+### ORDER
+POST http://localhost:8080/orders
+Content-Type: application/json
+
+{
+  "items": [
+    {
+      "bookId": 717,
+      "quantity": 10
+    },
+    {
+      "bookId": 720,
+      "quantity": 30
+    }
+  ],
+  "recipient": {
+    "name": "Admin",
+    "phone": "111-111-111",
+    "street": "Sloneczna 1",
+    "city": "Warszawa",
+    "zipCode": "00-001",
+    "email": "admin"
+  }
+}
 ###
 GET http://localhost:8080/orders/9
 

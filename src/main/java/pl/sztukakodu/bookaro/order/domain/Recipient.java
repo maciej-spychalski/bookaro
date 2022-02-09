@@ -30,13 +30,4 @@ public class Recipient extends BaseEntity {
 
     @LastModifiedDate
     private LocalDateTime updateAt;
-
-    public Recipient(String name, String phone, String street, String city, String zipCode, String email) {
-        this.name = name;
-        this.phone = phone;
-        this.street = street;
-        this.city = city;
-        this.zipCode = zipCode;
-        this.email = email;
-    }
 }

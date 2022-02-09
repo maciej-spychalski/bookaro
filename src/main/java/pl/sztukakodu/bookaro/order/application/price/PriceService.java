@@ -9,7 +9,7 @@ import java.util.List;
 
 @Service
 public class PriceService {
-    private final List<DiscountStrategy> srategies = List.of(
+    private final List<DiscountStrategy> strategies = List.of(
             new DeliveryDiscountStrategy(),
             new TotalPriceDiscountStrategy()
     );
@@ -24,9 +24,9 @@ public class PriceService {
     }
 
     private BigDecimal discounts(Order order) {
-        return srategies
+        return strategies
                 .stream()
-                .map(stragegy -> stragegy.calculate(order))
+                .map(strategy -> strategy.calculate(order))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

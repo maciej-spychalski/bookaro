@@ -19,7 +19,6 @@ class QueryOrderService implements QueryOrderUseCase {
     private final OrderJpaRepository repository;
     private final PriceService priceService;
 
-
     @Override
     @Transactional
     public List<RichOrder> findAll() {
@@ -47,5 +46,4 @@ class QueryOrderService implements QueryOrderUseCase {
                 orderPrice.finalPrice()
         );
     }
-
 }

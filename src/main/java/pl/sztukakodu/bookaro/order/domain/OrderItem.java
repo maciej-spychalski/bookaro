@@ -14,8 +14,8 @@ import javax.persistence.ManyToOne;
 @Getter
 @Setter
 @Entity
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class OrderItem extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "book_id")

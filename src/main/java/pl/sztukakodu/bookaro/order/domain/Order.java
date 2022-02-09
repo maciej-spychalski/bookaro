@@ -9,7 +9,6 @@ import pl.sztukakodu.bookaro.jpa.BaseEntity;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -42,10 +41,10 @@ public class Order extends BaseEntity {
     private LocalDateTime createdAt;
 
     @LastModifiedDate
-    private LocalDateTime updateAt;
+    private LocalDateTime updatedAt;
 
     public UpdateStatusResult updateStatus(OrderStatus newStatus) {
-        UpdateStatusResult result = status.updateStatus(newStatus);
+        UpdateStatusResult result = this.status.updateStatus(newStatus);
         this.status = result.getNewStatus();
         return result;
     }

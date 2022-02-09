@@ -297,7 +297,7 @@ class OrderServiceTest {
                 .builder()
                 .recipient(recipient(recipient))
                 .item(new OrderItemCommand(bookId, copies))
-                .deliver(Delivery.COURIER)
+                .delivery(Delivery.COURIER)
                 .build();
         return service.placeOrder(command).getRight();
     }

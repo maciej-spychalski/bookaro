@@ -1,4 +1,4 @@
-package pl.sztukakodu.bookaro.web;
+package pl.sztukakodu.bookaro.user.domain.web;
 
 import lombok.AllArgsConstructor;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;

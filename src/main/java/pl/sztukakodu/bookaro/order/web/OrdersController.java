@@ -3,9 +3,8 @@ package pl.sztukakodu.bookaro.order.web;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import pl.sztukakodu.bookaro.order.application.port.ManipulateOrderUseCase;
@@ -14,7 +13,7 @@ import pl.sztukakodu.bookaro.order.application.port.QueryOrderUseCase;
 import pl.sztukakodu.bookaro.order.application.RichOrder;
 import pl.sztukakodu.bookaro.order.domain.OrderStatus;
 import pl.sztukakodu.bookaro.security.UserSecurity;
-import pl.sztukakodu.bookaro.web.CreatedURI;
+import pl.sztukakodu.bookaro.user.domain.web.CreatedURI;
 
 import java.net.URI;
 import java.util.List;
@@ -39,13 +38,13 @@ class OrdersController {
 
     @Secured({"ROLE_ADMIN", "ROLE_USER"})
     @GetMapping("/{id}")
-    public ResponseEntity<RichOrder> getOrderById(@PathVariable Long id, @AuthenticationPrincipal User user) {
+    public ResponseEntity<RichOrder> getOrderById(@PathVariable Long id, @AuthenticationPrincipal UserDetails user) {
         return queryOrder.findById(id)
                 .map(order ->authorize(order, user))
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    private ResponseEntity<RichOrder> authorize(RichOrder order, User user ) {
+    private ResponseEntity<RichOrder> authorize(RichOrder order, UserDetails user ) {
         if(userSecurity.isOwnerOrAdmin(order.getRecipient().getEmail(), user)) {
             return ResponseEntity.ok(order);
         }
@@ -54,14 +53,32 @@ class OrdersController {
 
     @PostMapping
     @ResponseStatus(CREATED)
-    public ResponseEntity<Object> createOrder(@RequestBody PlaceOrderCommand  command) {
+    public ResponseEntity<Object> createOrder(@RequestBody PlaceOrderCommand command) {
+        PlaceOrderCommand command1 = PlaceOrderCommand
+                .builder()
+                .recipient(command.getRecipient())
+                .items(command.getItems())
+                .build();
         return manipulateOrder
-                .placeOrder(command)
+                .placeOrder(command1)
                 .handle(
                         orderId -> ResponseEntity.created(orderUri(orderId)).build(),
                         error -> ResponseEntity.badRequest().body(error)
                 );
     }
+
+    // TODO-Maciek: znalezc blad
+    // Delivery = NULL
+//    @PostMapping
+//    @ResponseStatus(CREATED)
+//    public ResponseEntity<Object> createOrder(@RequestBody PlaceOrderCommand command) {
+//        return manipulateOrder
+//                .placeOrder(command)
+//                .handle(
+//                        orderId -> ResponseEntity.created(orderUri(orderId)).build(),
+//                        error -> ResponseEntity.badRequest().body(error)
+//                );
+//    }
 
     URI orderUri(Long orderId) {
         return new CreatedURI("/" + orderId).uri();
@@ -70,7 +87,7 @@ class OrdersController {
     @Secured({"ROLE_ADMIN", "ROLE_USER"})
     @PatchMapping("/{id}/status")
     public ResponseEntity<Object> updateOrderStatus(@PathVariable Long id, @RequestBody Map<String, String> body,
-                                  @AuthenticationPrincipal User user) {
+                                                    @AuthenticationPrincipal UserDetails	user) {
         String status = body.get("status");
         OrderStatus orderStatus = OrderStatus
                 .parseString(status)

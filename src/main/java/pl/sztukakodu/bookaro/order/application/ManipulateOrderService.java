@@ -8,9 +8,11 @@ import pl.sztukakodu.bookaro.catalog.domain.Book;
 import pl.sztukakodu.bookaro.order.application.port.ManipulateOrderUseCase;
 import pl.sztukakodu.bookaro.order.db.OrderJpaRepository;
 import pl.sztukakodu.bookaro.order.db.RecipientJpaRepository;
-import pl.sztukakodu.bookaro.order.domain.*;
+import pl.sztukakodu.bookaro.order.domain.Order;
+import pl.sztukakodu.bookaro.order.domain.OrderItem;
+import pl.sztukakodu.bookaro.order.domain.Recipient;
+import pl.sztukakodu.bookaro.order.domain.UpdateStatusResult;
 import pl.sztukakodu.bookaro.security.UserSecurity;
-
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -19,7 +21,6 @@ import java.util.stream.Collectors;
 @Transactional
 @RequiredArgsConstructor
 class ManipulateOrderService implements ManipulateOrderUseCase {
-
     private final OrderJpaRepository repository;
     private final BookJpaRepository bookJpaRepository;
     private final RecipientJpaRepository recipientJpaRepository;
@@ -27,14 +28,15 @@ class ManipulateOrderService implements ManipulateOrderUseCase {
 
     @Override
     public PlaceOrderResponse placeOrder(PlaceOrderCommand command) {
-        Set<OrderItem> items = command.getItems()
+        Set<OrderItem> items = command
+                .getItems()
                 .stream()
                 .map(this::toOrderItem)
                 .collect(Collectors.toSet());
         Order order = Order
                 .builder()
                 .recipient(getOrCreateRecipient(command.getRecipient()))
-                .delivery(command.getDeliver())
+                .delivery(command.getDelivery())
                 .items(items)
                 .build();
         Order savedOrder = repository.save(order);
@@ -48,10 +50,6 @@ class ManipulateOrderService implements ManipulateOrderUseCase {
                 .orElse(recipient);
     }
 
-    private Recipient getRecipient(PlaceOrderCommand command) {
-        return command.getRecipient();
-    }
-
     private Set<Book> reduceBooks(Set<OrderItem> items) {
         return items
                 .stream()
@@ -59,21 +57,17 @@ class ManipulateOrderService implements ManipulateOrderUseCase {
                     Book book = item.getBook();
                     book.setAvailable(book.getAvailable() - item.getQuantity());
                     return book;
-                }).collect(Collectors.toSet());
+                })
+                .collect(Collectors.toSet());
     }
 
     private OrderItem toOrderItem(OrderItemCommand command) {
-        Book book = bookJpaRepository.getById(command.getBookId());
+        Book book = bookJpaRepository.getOne(command.getBookId());
         int quantity = command.getQuantity();
-        if (quantity < 0) {
-            throw new IllegalArgumentException("The number of copies of the requested book" + book.getId() +
-                    " cannot be less than zero");
-        }
         if (book.getAvailable() >= quantity) {
-            return new OrderItem(book, command.getQuantity());
+            return new OrderItem(book, quantity);
         }
-        throw new IllegalArgumentException("Too many copies of book " + book.getId() + " requested: " + quantity +
-               " of " + book.getAvailable() + " available ");
+        throw new IllegalArgumentException("Too many copies of book " + book.getId() + " requested: " + quantity + " of " + book.getAvailable() + " available ");
     }
 
     @Override
@@ -84,11 +78,12 @@ class ManipulateOrderService implements ManipulateOrderUseCase {
     @Override
     @Transactional
     public UpdateStatusResponse updateOrderStatus(UpdateStatusCommand command) {
-        return repository.findById(command.getOrderId())
+        return repository
+                .findById(command.getOrderId())
                 .map(order -> {
                     if(userSecurity.isOwnerOrAdmin(order.getRecipient().getEmail(), command.getUser())) {
                         UpdateStatusResult result = order.updateStatus(command.getStatus());
-                        if(result.isRevoked()) {
+                        if (result.isRevoked()) {
                             bookJpaRepository.saveAll(revokeBooks(order.getItems()));
                         }
                         repository.save(order);
@@ -106,6 +101,7 @@ class ManipulateOrderService implements ManipulateOrderUseCase {
                     Book book = item.getBook();
                     book.setAvailable(book.getAvailable() + item.getQuantity());
                     return book;
-                }).collect(Collectors.toSet());
+                })
+                .collect(Collectors.toSet());
     }
 }

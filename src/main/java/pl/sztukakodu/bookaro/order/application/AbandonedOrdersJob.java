@@ -37,7 +37,6 @@ public class AbandonedOrdersJob {
         List<Order> orders = repository.findByStatusAndCreatedAtLessThanEqual(OrderStatus.NEW, olderThan);
         log.info("Found orders to be abandoned: " + orders.size());
         orders.forEach(order -> {
-            User systemUser = new User("systemUser", "", List.of(new SimpleGrantedAuthority("ROLE_ADMIN")));
             UpdateStatusCommand command = new UpdateStatusCommand(order.getId(), OrderStatus.ABANDONED, systemUser);
             orderUseCase.updateOrderStatus(command);
         });
