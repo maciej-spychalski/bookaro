@@ -8,12 +8,10 @@ import pl.sztukakodu.bookaro.catalog.domain.Book;
 import pl.sztukakodu.bookaro.order.application.port.ManipulateOrderUseCase;
 import pl.sztukakodu.bookaro.order.db.OrderJpaRepository;
 import pl.sztukakodu.bookaro.order.db.RecipientJpaRepository;
-import pl.sztukakodu.bookaro.order.domain.Order;
-import pl.sztukakodu.bookaro.order.domain.OrderItem;
-import pl.sztukakodu.bookaro.order.domain.Recipient;
-import pl.sztukakodu.bookaro.order.domain.UpdateStatusResult;
+import pl.sztukakodu.bookaro.order.domain.*;
 import pl.sztukakodu.bookaro.security.UserSecurity;
 
+import javax.validation.constraints.Null;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -33,10 +31,12 @@ class ManipulateOrderService implements ManipulateOrderUseCase {
                 .stream()
                 .map(this::toOrderItem)
                 .collect(Collectors.toSet());
+        // TODO-Maciek: Poprwic walidacje zamówienia
+        Delivery delivery = (command.getDelivery() != null) ? command.getDelivery() : Delivery.COURIER;
         Order order = Order
                 .builder()
                 .recipient(getOrCreateRecipient(command.getRecipient()))
-                .delivery(command.getDelivery())
+                .delivery(delivery)
                 .items(items)
                 .build();
         Order savedOrder = repository.save(order);

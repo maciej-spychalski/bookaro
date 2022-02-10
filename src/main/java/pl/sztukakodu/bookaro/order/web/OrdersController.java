@@ -54,31 +54,13 @@ class OrdersController {
     @PostMapping
     @ResponseStatus(CREATED)
     public ResponseEntity<Object> createOrder(@RequestBody PlaceOrderCommand command) {
-        PlaceOrderCommand command1 = PlaceOrderCommand
-                .builder()
-                .recipient(command.getRecipient())
-                .items(command.getItems())
-                .build();
         return manipulateOrder
-                .placeOrder(command1)
+                .placeOrder(command)
                 .handle(
                         orderId -> ResponseEntity.created(orderUri(orderId)).build(),
                         error -> ResponseEntity.badRequest().body(error)
                 );
     }
-
-    // TODO-Maciek: znalezc blad
-    // Delivery = NULL
-//    @PostMapping
-//    @ResponseStatus(CREATED)
-//    public ResponseEntity<Object> createOrder(@RequestBody PlaceOrderCommand command) {
-//        return manipulateOrder
-//                .placeOrder(command)
-//                .handle(
-//                        orderId -> ResponseEntity.created(orderUri(orderId)).build(),
-//                        error -> ResponseEntity.badRequest().body(error)
-//                );
-//    }
 
     URI orderUri(Long orderId) {
         return new CreatedURI("/" + orderId).uri();
