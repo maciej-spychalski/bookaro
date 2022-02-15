@@ -13,7 +13,7 @@ import pl.sztukakodu.bookaro.order.application.port.QueryOrderUseCase;
 import pl.sztukakodu.bookaro.order.application.RichOrder;
 import pl.sztukakodu.bookaro.order.domain.OrderStatus;
 import pl.sztukakodu.bookaro.security.UserSecurity;
-import pl.sztukakodu.bookaro.user.domain.web.CreatedURI;
+import pl.sztukakodu.bookaro.web.CreatedURI;
 
 import java.net.URI;
 import java.util.List;

@@ -15,7 +15,7 @@ import pl.sztukakodu.bookaro.catalog.application.port.CatalogUseCase.UpdateBookC
 import pl.sztukakodu.bookaro.catalog.application.port.CatalogUseCase.UpdateBookCoverCommand;
 import pl.sztukakodu.bookaro.catalog.application.port.CatalogUseCase.UpdateBookResponse;
 import pl.sztukakodu.bookaro.catalog.domain.Book;
-import pl.sztukakodu.bookaro.user.domain.web.CreatedURI;
+import pl.sztukakodu.bookaro.web.CreatedURI;
 
 import javax.validation.Valid;
 import javax.validation.constraints.*;
