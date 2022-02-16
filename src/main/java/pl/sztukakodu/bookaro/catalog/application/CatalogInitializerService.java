@@ -20,9 +20,9 @@ import pl.sztukakodu.bookaro.catalog.db.AuthorJpaRepository;
 import pl.sztukakodu.bookaro.catalog.domain.Author;
 import pl.sztukakodu.bookaro.catalog.domain.Book;
 import pl.sztukakodu.bookaro.jpa.BaseEntity;
-import pl.sztukakodu.bookaro.order.application.port.ManipulateOrderUseCase;
-import pl.sztukakodu.bookaro.order.application.port.QueryOrderUseCase;
-import pl.sztukakodu.bookaro.order.domain.Recipient;
+import pl.sztukakodu.bookaro.orders.application.port.ManipulateOrderUseCase;
+import pl.sztukakodu.bookaro.orders.application.port.QueryOrderUseCase;
+import pl.sztukakodu.bookaro.orders.domain.Recipient;
 
 import java.io.BufferedReader;
 import java.io.IOException;
