@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.annotation.DirtiesContext;
 import pl.sztukakodu.bookaro.catalog.application.port.CatalogUseCase;
 import pl.sztukakodu.bookaro.catalog.db.AuthorJpaRepository;
@@ -39,7 +40,7 @@ class CatalogControllerIT {
         givenEffectiveJava();
         givenJavaConcurrencyInPractice();
         // When
-        List<Book> all = controller.getAll(Optional.empty(), Optional.empty());
+        List<RestBook> all = controller.getAll(mockRequest(), Optional.empty(), Optional.empty());
         // Then
         assertEquals(2, all.size());
     }
@@ -50,7 +51,7 @@ class CatalogControllerIT {
         givenEffectiveJava();
         givenJavaConcurrencyInPractice();
         // When
-        List<Book> all = controller.getAll(Optional.empty(), Optional.of("Bloch"));
+        List<RestBook> all = controller.getAll(mockRequest(), Optional.empty(), Optional.of("Bloch"));
         // Then
         assertEquals(1, all.size());
         assertEquals("Effective Java", all.get(0).getTitle());
@@ -76,6 +77,10 @@ class CatalogControllerIT {
                 new BigDecimal("119.00"),
                 50L
         ));
+    }
+
+    private MockHttpServletRequest mockRequest() {
+        return new MockHttpServletRequest();
     }
 
 }
