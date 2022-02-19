@@ -47,6 +47,7 @@ public class BookaroSecurityConfiguration extends WebSecurityConfigurerAdapter i
     protected void configure(HttpSecurity http) throws Exception {
         // GET catalog, GET catalog/ID
         http.csrf().disable();
+        http.cors();
         http
                 .authorizeRequests()
                 .mvcMatchers(HttpMethod.GET,"/catalog/**", "/uploads/**", "/authors/**").permitAll()
