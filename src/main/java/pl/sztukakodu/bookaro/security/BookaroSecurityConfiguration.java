@@ -70,8 +70,8 @@ public class BookaroSecurityConfiguration extends WebSecurityConfigurerAdapter i
     }
 
     @SneakyThrows
-    private JasonUsernameAuthenticationFilter authenticationFilter() {
-        JasonUsernameAuthenticationFilter filter = new JasonUsernameAuthenticationFilter();
+    private JsonUsernameAuthenticationFilter authenticationFilter() {
+        JsonUsernameAuthenticationFilter filter = new JsonUsernameAuthenticationFilter();
         filter.setAuthenticationManager(super.authenticationManager());
         return filter;
     }

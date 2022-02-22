@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 
-public class JasonUsernameAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+public class JsonUsernameAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private final ObjectMapper mapper = new ObjectMapper();
 
